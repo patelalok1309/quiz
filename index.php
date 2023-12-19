@@ -23,15 +23,22 @@ if (!isset($_SESSION["username"])) {
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
     <link rel="stylesheet" href="//cdn.datatables.net/1.13.7/css/jquery.dataTables.min.css">
     <script src="//cdn.datatables.net/1.13.7/js/jquery.dataTables.min.js"></script>
+    <style>
+        .boxshadow {
+            /* box-shadow: rgba(0, 0, 0, 0.35) 0px 5px 15px; */
+            box-shadow: rgba(0, 0, 0, 0.24) 0px 3px 8px;
+        }
+    </style>
 </head>
 
 <body>
 
     <?php include("./components/navbar.php"); ?>
-    <div class="container col-6 border border-1 mt-5 ">
+    <div class="container col-6 border border-1 mt-5 boxshadow">
         <h2 class="text-center ">
             Quiz App
         </h2>
+        <hr>
         <?php include("./components/quiz.php"); ?>
     </div>
 </body>

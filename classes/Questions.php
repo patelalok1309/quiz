@@ -42,7 +42,7 @@ class Question
         if ($conn->query($sql) == true) {
             return true;
         } else {
-            echo "Sorry try harder";
+            echo "failed to Add new Option";
         }
     }
 
@@ -81,7 +81,7 @@ class Question
             $nextOption = "opt" . $optionIndex + 1;
 
             if ($optionIndex != 4) {
-                $sql = "UPDATE `quizques` SET  `$opt`=`$nextOption`, `$nextOption` = null  WHERE `quizques`.`sno` = '$sno' ";
+                $sql = "UPDATE `quizques` SET  `$opt`=`$nextOption`, `$nextOption` = null  WHERE quizques.sno = '$sno' ";
                 if ($conn->query($sql) == true) {
                     return true;
                 } else {
@@ -95,6 +95,16 @@ class Question
                     echo "Sorry try harder";
                 }
             }
+        }
+    }
+
+    public function markAns($conn, $opt, $sno)
+    {
+        $sql = "UPDATE `quizques` SET `answer` = `$opt` WHERE `quizques`.`sno` = '$sno'";
+        if ($conn->query($sql) == true) {
+            return true;
+        } else {
+            echo "failed to update the answer";
         }
     }
 

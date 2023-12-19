@@ -12,7 +12,6 @@ if ($result->num_rows > 0) {
         unset($row["answer"]);
         array_push($arr, $row);
     }
-
     echo json_encode($arr);
 }
 ?>

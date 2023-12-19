@@ -1,4 +1,5 @@
 <?php
+session_start();
 include("../classes/Database.php");
 $connectDb = new DatabaseConnection("localhost", "root", "", "quiz");
 $conn = $connectDb->connect();
@@ -12,15 +13,14 @@ if ($result->num_rows >= 0) {
         array_push($arr, $row);
     }
 }
-echo "Database Array count is " . count($arr);
 
 $trueAns = 0;
+$tempArr = array("rightAns" => 0, "wrongAns" => 0, "username" => $_SESSION['username']);
+$temp = 0;
+
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $resArr = $_POST['data'];
     $resArr = json_decode($resArr, true);
-
-    echo "\nresponse array size " . count($resArr) . "\n";
-
     $count = 0;
     $wrongAns = 0;
     $totalChecks = 0;
@@ -30,19 +30,15 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 $totalChecks++;
                 if ($item1['answer'] == $item2['answer']) {
                     $count++;
-                    echo $item1['sno'] . " " . $item1['answer'];
-                    echo "\n";
+                    $tempArr['rightAns']++;
+
                 } else {
-                    $wrongAns++;
-                    echo $item1['sno'] . "------------------- " . $item2['answer'];
-                    echo "\n";
+                    $tempArr['wrongAns']++;
                 }
                 break;
             }
         }
     }
-    echo "\n ToTal checked questions are :" . $totalChecks;
-    echo "The Total true answers are : " . $count;
-    echo "\nThe Total false answers are : " . $wrongAns;
+    echo json_encode($tempArr);
 }
 ?>

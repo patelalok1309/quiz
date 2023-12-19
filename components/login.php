@@ -13,7 +13,6 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $sql = "SELECT * FROM `users` WHERE `username`='$username' AND `password`='$password'";
     $result = mysqli_query($conn, $sql);
 
-
     if ($result->num_rows != 0) {
         $loginSuccess = true;
         $row = $result->fetch_assoc();

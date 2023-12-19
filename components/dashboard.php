@@ -1,8 +1,12 @@
 <?php
+session_start();
+if ($_SESSION['role'] != 'admin') {
+    header("Location: /cwh/quiz/index.php", true);
+}
+
 include("../classes/Database.php");
 include("../classes/Questions.php");
 include("./alert.php");
-include("./checkUser.php");
 
 // object initializations 
 $connectDb = new DatabaseConnection('localhost', 'root', '', 'quiz');
@@ -14,11 +18,20 @@ $updateAlert = false;
 $updateMessage = "";
 
 if (isset($_GET["deleteOpt"])) {
+    echo "deleteopt";
     $optionIndex = $_GET["deleteOpt"];
     $id = $_GET["id"];
     $updateAlert = $questionObj->deleteOption($conn, $optionIndex, $id);
-    header("Location: /cwh/quiz/components/dashboard.php", true);
+    // header('Location: /cwh/quiz/components/dashboard.php', true);
+    unset($_SESSION["deleteOpt"]);
 }
+if (isset($_GET["ansOpt"])) {
+    $id = $_GET["id"];
+    $optionIndex = $_GET["opt"];
+    $updateAlert = $questionObj->markAns($conn, $optionIndex, $id);
+    // header("Location: /cwh/quiz/components/dashboard.php", true);
+}
+
 
 if ($_SERVER['REQUEST_METHOD'] == "POST") {
     $question = isset($_POST["question"]) ? $_POST["question"] : null;
@@ -42,6 +55,18 @@ if ($_SERVER['REQUEST_METHOD'] == "POST") {
             } else {
                 $updateAlert = $questionObj->addOption($conn, "opt4", $opt4, $id);
             }
+        } else if ($opt1) {
+            if (isset($_POST["ansFlag"])) {
+                $updateAlert = $questionObj->addOption($conn, "opt1", $opt1, $id, true, $ans);
+            } else {
+                $updateAlert = $questionObj->addOption($conn, "opt1", $opt1, $id);
+            }
+        } else if ($opt2) {
+            if (isset($_POST["ansFlag"])) {
+                $updateAlert = $questionObj->addOption($conn, "opt2", $opt2, $id, true, $ans);
+            } else {
+                $updateAlert = $questionObj->addOption($conn, "opt2", $opt2, $id);
+            }
         }
     } else {
         $questionObj = new Question($question, $opt1, $opt2, $opt3, $opt4, $ans);
@@ -50,7 +75,26 @@ if ($_SERVER['REQUEST_METHOD'] == "POST") {
             $quesAlert = true;
         }
     }
+    // // if ($row["opt1"] == null) {
+    // //     echo "<form action='/cwh/quiz/components/dashboard.php' method='post' >
+    // //         <input type='hidden' name='updateOpt' id='updateOpt' value=" . $row['sno'] . ">
+    // //         <div class='form-group my-2 d-flex align-items-center justify-content-center'>
+    // //         <input type='radio' name='ansFlag' class='ansFlag'>
+    // //         <input type='text' name='opt1' id='opt1' placeholder='Enter Option 1' class='form-control form-control-sm w-50 mx-2 h-75 optionInput'>
+    // //         <input type='submit' value='submit' class='btn btn-outline-secondary btn-sm my-2'>
+    // //         </div>
+    // //         </div>
+    // //         </form>";
+    // // } else {
+    // //     echo $row['opt1'];
+    // //     echo "<button class='removeBtn deleteOpt float-end ' id='opt1' value=" . $row['sno'] . " > remove </button>";
+    // // }
+
+    // function displayOptions($option , $srno , ){
+    //     return ""
+    // }
 }
+
 ?>
 
 <!DOCTYPE html>
@@ -77,6 +121,17 @@ if ($_SERVER['REQUEST_METHOD'] == "POST") {
             color: white;
             text-align: center;
             background-color: #f04747;
+            border: 1px solid black;
+            border-radius: 10px;
+        }
+
+        .ansFlagBtn {
+            font-size: 0.75rem;
+            margin-left: 0.75rem;
+            width: auto;
+            color: white;
+            text-align: center;
+            background-color: #ff0000;
             border: 1px solid black;
             border-radius: 10px;
         }
@@ -144,43 +199,29 @@ if ($_SERVER['REQUEST_METHOD'] == "POST") {
                         echo "<tr>
                         <th scope='row'>" . $srno . "</th>
                         <td>" . $row['question'] . "</td>
-                        <td>" . $row['opt1'] . " </td>
-                        <td>" . $row['opt2'] . "</td>
-                        <td>";
-                        if ($row["opt3"] == null) {
-                            echo "<form action='/cwh/quiz/components/dashboard.php' method='post' >
-                                <input type='hidden' name='updateOpt' id='updateOpt' value=" . $row['sno'] . ">
-                                <div class='form-group my-2 d-flex align-items-center '>
-                                <input type='radio' name='ansFlag' class='ansFlag'>
-                                <input type='text' name='opt3' id='opt3' placeholder='Enter Option 3' class='form-control form-control-sm w-50 mx-2 h-75 optionInput'>
-                                <input type='submit' value='submit' class='btn btn-outline-secondary btn-sm my-2'>
-                                </div>
-                                </div>
-                                </form>";
-                        } else {
-                            echo $row['opt3'];
-                            echo "<button class='removeBtn deleteOpt float-end ' id='opt3' value=" . $row['sno'] . " > remove </button>";
-                        }
-                        echo "</td>
-                        <td>";
-                        if ($row["opt4"] == null) {
-                            echo "<form action='/cwh/quiz/components/dashboard.php' method='post' >
-                                <input type='hidden' name='updateOpt' id='updateOpt' value=" . $row['sno'] . ">
-                                <div class='form-group my-2 d-flex align-items-center '>
-                                <input type='radio' name='ansFlag' class='ansFlag'>
-                                <input type='text' name='opt4' id='opt4' placeholder='Enter Option 4' class='form-control form-control-sm w-50 mx-2 h-75 optionInput'>
-                                <input type='submit' value='submit' class='btn btn-outline-secondary btn-sm my-2'>
-                                </div>
-                                </div>
-                                </form>";
-                        } else {
-                            echo $row['opt4'];
-                            echo "<button class='removeBtn deleteOpt float-end' id='opt4' value=" . $row['sno'] . "> remove </button>";
+                        ";
+                        $options = array($row['opt1'], $row['opt2'], $row['opt3'], $row['opt4']);
 
+                        for ($i = 0; $i <= 3; $i++) {
+                            if ($options[$i] == null) {
+                                echo "<td><form action='/cwh/quiz/components/dashboard.php' method='post' >
+                                <input type='hidden' name='updateOpt' id='updateOpt' value=" . $row['sno'] . ">
+                                <div class='form-group my-2 d-flex align-items-center justify-content-center'>
+                                <input type='radio' name='ansFlag' class='ansFlag'>
+                                <input type='text' name='opt" . $i + 1 . "' id='opt" . $i + 1 . "' placeholder='Enter Option " . $i + 1 . "' class='form-control form-control-sm w-50 mx-2 h-75 optionInput'>
+                                <input type='submit' value='submit' class='btn btn-outline-secondary btn-sm my-2'>
+                                </div>
+                                </div>
+                                </form></td>";
+                            } else {
+                                echo "<td>" . $options[$i];
+                                echo "<button class='removeBtn deleteOpt float-end ' id='opt" . $i + 1 . "' value=" . $row['sno'] . " > remove </button>";
+                                $answervalue = strval($options[$i]);
+                                $option = "opt" . $i + 1;
+                                echo " <button class='ansFlagBtn ansOpt float-end mx-2' id=" . $row['sno'] . "  value='$option'> answer </button>";
+                            }
                         }
-                        echo "</td>
-                        <td>" . $row['answer'] . "</td>
-                        </tr>";
+                        echo "</td><td>" . $row['answer'] . "</td></tr>";
                         $srno++;
                     }
                 }
@@ -189,13 +230,6 @@ if ($_SERVER['REQUEST_METHOD'] == "POST") {
         </table>
     </div>
 
-    <pre>
-
-
-
-
-
-    </pre>
     <script>
 
         const answers = document.getElementsByClassName('ansFlag');
@@ -225,6 +259,7 @@ if ($_SERVER['REQUEST_METHOD'] == "POST") {
             element.addEventListener("click", (e) => {
                 sno = e.target.value;
                 optionIndex = e.target.id;
+                console.log('helo')
                 if (confirm("Are you sure You really won't to delete note!")) {
                     console.log('yes');
                     window.location = `/cwh/quiz/components/dashboard.php?deleteOpt=${optionIndex}&id=${sno}`;
@@ -233,18 +268,20 @@ if ($_SERVER['REQUEST_METHOD'] == "POST") {
                 }
             })
         })
-        // const deletes = document.getElementsByClassName('deleteOpt');
-        // Array.from(deletes).forEach((element) => {
-        //     element.addEventListener("click", (e) => {
-        //         sno = e.target.id;
-        //         if (confirm("Are you sure You really won't to delete note!")) {
-        //             console.log('yes');
-        //             window.location = `/cwh/quiz/components/dashboard.php?deleteOpt3=${sno}`;
-        //         } else {
-        //             console.log('no');
-        //         }
-        //     })
-        // })
+        const answersOption = document.getElementsByClassName('ansOpt');
+        Array.from(answersOption).forEach((element) => {
+            element.addEventListener("click", (e) => {
+                sno = e.target.id;
+                option = e.target.value;
+                console.log(sno, option, e.target);
+                if (confirm("Are you sure You really won't to Mark as answer!")) {
+                    console.log('yes');
+                    window.location = `/cwh/quiz/components/dashboard.php?id=${sno}&opt=${option}&ansOpt=true`;
+                } else {
+                    console.log('no');
+                }
+            })
+        })
         const deletesOpt4 = document.getElementsByClassName('deleteOpt4');
         Array.from(deletesOpt4).forEach((element) => {
             element.addEventListener("click", (e) => {
