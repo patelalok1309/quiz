@@ -18,7 +18,6 @@ $updateAlert = false;
 $updateMessage = "";
 
 if (isset($_GET["deleteOpt"])) {
-    echo "deleteopt";
     $optionIndex = $_GET["deleteOpt"];
     $id = $_GET["id"];
     $updateAlert = $questionObj->deleteOption($conn, $optionIndex, $id);
@@ -114,13 +113,25 @@ if ($_SERVER['REQUEST_METHOD'] == "POST") {
     <link rel="stylesheet" href="//cdn.datatables.net/1.13.7/css/jquery.dataTables.min.css">
     <script src="//cdn.datatables.net/1.13.7/js/jquery.dataTables.min.js"></script>
     <style>
+        .submitBtn {
+            width: 150px;
+            height: 2rem;
+            text-align: center;
+            font-size: 1rem;
+            border: 1px solid #e50000;
+            border-radius: 20px;
+            background-color: #e50000;
+            color: white;
+            box-shadow: none;
+        }
+
         .removeBtn {
             font-size: 0.75rem;
             margin-left: 0.75rem;
             width: auto;
             color: white;
             text-align: center;
-            background-color: #f04747;
+            background-color: #d30b0b;
             border: 1px solid black;
             border-radius: 10px;
         }
@@ -150,7 +161,8 @@ if ($_SERVER['REQUEST_METHOD'] == "POST") {
 
     ?>
 
-    <div class="container col-md-6 mt-3  border border-1 ">
+
+    <div class="container col-md-6 mt-3  border border-1 " style="box-shadow: rgba(0, 0, 0, 0.24) 0px 3px 8px;">
         <h1 class="text-center">Add Question</h1>
         <form class="" action="/cwh/quiz/components/dashboard.php" method="POST" id="myform">
             <div class="form-group my-4 ">
@@ -171,14 +183,14 @@ if ($_SERVER['REQUEST_METHOD'] == "POST") {
                 <input type="text" name="opt2" id="opt2" placeholder="Enter Option 2"
                     class="form-control form-control-sm w-50 mx-2 ">
             </div>
-            <input type="submit" value="submit" class="btn btn-outline-secondary btn-sm my-2">
+            <input type="submit" value="submit" class="submitBtn my-2">
         </form>
     </div>
 
     <div class="container my-3 ">
         <h2 class="text-center">Question Dashboard</h2>
         <table class="table table-hover table-bordered ">
-            <thead>
+            <thead class="">
                 <tr>
                     <th>Sr.no</th>
                     <th>Question</th>
@@ -203,8 +215,9 @@ if ($_SERVER['REQUEST_METHOD'] == "POST") {
                         $options = array($row['opt1'], $row['opt2'], $row['opt3'], $row['opt4']);
 
                         for ($i = 0; $i <= 3; $i++) {
+                            echo "<td>";
                             if ($options[$i] == null) {
-                                echo "<td><form action='/cwh/quiz/components/dashboard.php' method='post' >
+                                echo "<form action='/cwh/quiz/components/dashboard.php' method='post' >
                                 <input type='hidden' name='updateOpt' id='updateOpt' value=" . $row['sno'] . ">
                                 <div class='form-group my-2 d-flex align-items-center justify-content-center'>
                                 <input type='radio' name='ansFlag' class='ansFlag'>
@@ -214,12 +227,12 @@ if ($_SERVER['REQUEST_METHOD'] == "POST") {
                                 </div>
                                 </form></td>";
                             } else {
-                                echo "<td>" . $options[$i];
-                                echo "<button class='removeBtn deleteOpt float-end ' id='opt" . $i + 1 . "' value=" . $row['sno'] . " > remove </button>";
-                                $answervalue = strval($options[$i]);
                                 $option = "opt" . $i + 1;
-                                echo " <button class='ansFlagBtn ansOpt float-end mx-2' id=" . $row['sno'] . "  value='$option'> answer </button>";
+                                echo "<div class='d-flex justify-content-start flex-column gap-1 '> <div>" . $options[$i] . "</div>";
+                                echo "<div class='d-flex justify-content-start flex-row gap-1 align-items-start   '><button class='removeBtn deleteOpt ' id='opt" . $i + 1 . "' value=" . $row['sno'] . " > remove </button>";
+                                echo " <button class='ansFlagBtn ansOpt  mx-2' id=" . $row['sno'] . "  value='$option'> answer </button></div></div>";
                             }
+                            echo "</td>";
                         }
                         echo "</td><td>" . $row['answer'] . "</td></tr>";
                         $srno++;
@@ -259,8 +272,7 @@ if ($_SERVER['REQUEST_METHOD'] == "POST") {
             element.addEventListener("click", (e) => {
                 sno = e.target.value;
                 optionIndex = e.target.id;
-                console.log('helo')
-                if (confirm("Are you sure You really won't to delete note!")) {
+                if (confirm("Are you sure You really wan't to delete note!")) {
                     console.log('yes');
                     window.location = `/cwh/quiz/components/dashboard.php?deleteOpt=${optionIndex}&id=${sno}`;
                 } else {
@@ -274,21 +286,9 @@ if ($_SERVER['REQUEST_METHOD'] == "POST") {
                 sno = e.target.id;
                 option = e.target.value;
                 console.log(sno, option, e.target);
-                if (confirm("Are you sure You really won't to Mark as answer!")) {
+                if (confirm("Are you sure You really wan't to Mark as answer!")) {
                     console.log('yes');
                     window.location = `/cwh/quiz/components/dashboard.php?id=${sno}&opt=${option}&ansOpt=true`;
-                } else {
-                    console.log('no');
-                }
-            })
-        })
-        const deletesOpt4 = document.getElementsByClassName('deleteOpt4');
-        Array.from(deletesOpt4).forEach((element) => {
-            element.addEventListener("click", (e) => {
-                sno = e.target.id;
-                if (confirm("Are you sure You really won't to delete note!")) {
-                    console.log('yes');
-                    window.location = `/cwh/quiz/components/dashboard.php?deleteOpt4=${sno}`;
                 } else {
                     console.log('no');
                 }

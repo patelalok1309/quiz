@@ -1,6 +1,10 @@
 <?php
 include("./database_connection.php");
 include("./alert.php");
+
+$db = new DatabaseConnection("localhost", "root", "", "quiz");
+$conn = $db->connect();
+
 $signUpError = false;
 $signUpSuccess = false;
 
