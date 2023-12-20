@@ -135,7 +135,6 @@ include("./classes/Quiz.php");
                     Data[i]['opt3'] = options[2];
                     Data[i]['opt4'] = options[3];
                 }
-                console.log(Data);
                 $('.resultField > *').css('display', 'none');
                 display();
             }
@@ -176,14 +175,12 @@ include("./classes/Quiz.php");
                     recordAns[quesIndex].answer = e.target.value;
                     recordAns[quesIndex].sno = Data[quesIndex].sno;
                     recordAns[quesIndex].option = e.target;
-                    console.clear();
                 })
             })
 
             function display() {
                 $("#srno").text(`${quesIndex + 1}/10`);
                 $("#question").text(Data[quesIndex].question);
-
                 optionArray = [Data[quesIndex].opt1, Data[quesIndex].opt2, Data[quesIndex].opt3, Data[quesIndex].opt4];
                 for (var i = 0; i <= 3; i++) {
                     if (optionArray[i] != null && optionArray[i] != '') {
@@ -228,7 +225,7 @@ include("./classes/Quiz.php");
                 url: '/cwh/quiz/components/history.php',
                 data: { data: ans },
                 success: function (response) {
-                    console.log('added', response)
+                    console.log('added')
                 },
                 error: function (xhr, status, error) {
                     console.error(error);

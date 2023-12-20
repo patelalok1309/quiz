@@ -13,9 +13,9 @@ class Users
         $this->email = $email;
     }
 
-    public function insertNewUser($conn)
+    public function insertNewUser($conn, $username, $password, $email)
     {
-        $sql = "INSERT INTO `users` (`sno`, `username`, `email`, `password`) VALUES (NULL, '$this->username', '$this->email', '$this->password')";
+        $sql = "INSERT INTO `users` ( `username`, `email`, `password`) VALUES ( '$username', '$email', '$password')";
         if ($conn->query($sql) == true) {
             return true;
         } else {

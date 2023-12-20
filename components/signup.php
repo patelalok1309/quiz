@@ -1,6 +1,8 @@
 <?php
-include("./database_connection.php");
+include("../classes/Database.php");
 include("./alert.php");
+include("../classes/users.php");
+$user = new Users();
 
 $db = new DatabaseConnection("localhost", "root", "", "quiz");
 $conn = $db->connect();
@@ -15,15 +17,10 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $email = $_POST['email'];
     $cpassword = $_POST['cpassword'];
 
-    if (($cpassword != $password) or (mysqli_num_rows(mysqli_query($conn, "SELECT * FROM `users` WHERE username='$username'")) > 0)) {
+    if (($cpassword != $password) or (mysqli_num_rows($conn->query("SELECT * FROM `users` WHERE username='$username'")) > 0)) {
         $signUpError = true;
     } else {
-        $sql = "INSERT INTO `users` (`sno`, `username`, `email`, `password`) VALUES (NULL, '$username', '$email', '$password')";
-        $result = mysqli_query($conn, $sql);
-        if ($result) {
-            $signUpSuccess = true;
-            header("Location: /cwh/quiz/components/login.php", true);
-        }
+        $user->insertNewUser($conn, $username, $password, $email);
     }
 }
 ?>

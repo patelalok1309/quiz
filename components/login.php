@@ -1,17 +1,18 @@
 <?php
 session_start();
-include("./database_connection.php");
+include("../classes/Database.php");
 include("./alert.php");
 
+$db = new DatabaseConnection("localhost", "root", "", "quiz");
+$conn = $db->connect();
 $loginerror = false;
 
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
-
     $username = $_POST['username'];
     $password = $_POST['password'];
 
     $sql = "SELECT * FROM `users` WHERE `username`='$username' AND `password`='$password'";
-    $result = mysqli_query($conn, $sql);
+    $result = $conn->query($sql);
 
     if ($result->num_rows != 0) {
         $loginSuccess = true;
@@ -19,6 +20,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         $_SESSION["username"] = $row['username'];
         $_SESSION['sno'] = $row['sno'];
         $_SESSION['role'] = $row['role'];
+        $_SESSION['email'] = $row['email'];
         header("Location: /cwh/quiz/index.php", true);
     } else {
         $loginerror = true;

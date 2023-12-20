@@ -1,13 +1,17 @@
 <?php
 session_start();
+include("./mail.php");
+
+
 include("../classes/Database.php");
 $db = new DatabaseConnection('localhost', 'root', "", 'quiz');
 $conn = $db->connect();
 
+
 if ($_SERVER['REQUEST_METHOD'] == "POST") {
     $dataArr = json_decode($_POST["data"], true);
     $username = $dataArr['username'];
-    $dateStamp = date("y/m/d h:i:sa");
+    $dateStamp = date("d/m/y h:i:sa");
     $result = $dataArr['rightAns'];
     $sql = "INSERT INTO `history` (`sno`, `username`, `timestamp`, `result`) VALUES (NULL, '$username', '$dateStamp', '$result')";
 
@@ -17,6 +21,7 @@ if ($_SERVER['REQUEST_METHOD'] == "POST") {
     } else {
         echo "failed to insert data in history";
     }
+    sendMail($result);
 }
 ?>
 <!DOCTYPE html>
@@ -41,15 +46,9 @@ if ($_SERVER['REQUEST_METHOD'] == "POST") {
 
     <div class="container mt-4 col-md-8">
         <div class="table-responsive">
-            <table class="table table-striped table-hover table-bordered table-primary align-middle">
+            <table class="table table-striped table-bordered table-hover table" id="myTable">
                 <thead class="table-dark ">
-                    <caption>
-                        Quiz History
-                        <br>
-                        <?php
-                        echo "Username :" . $_SESSION['username'];
-                        ?>
-                    </caption>
+
                     <tr>
                         <th>Sr.no</th>
                         <th>username</th>
@@ -78,8 +77,18 @@ if ($_SERVER['REQUEST_METHOD'] == "POST") {
                 </tfoot>
             </table>
         </div>
+        <caption>
+            Quiz History
+            <br>
+            <?php
+            echo "Username :" . $_SESSION['username'];
+            ?>
+        </caption>
     </div>
 
+    <script>
+        let table = new DataTable('#myTable');
+    </script>
 </body>
 
 </html>

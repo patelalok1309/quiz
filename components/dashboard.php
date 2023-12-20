@@ -31,7 +31,6 @@ if (isset($_GET["ansOpt"])) {
     // header("Location: /cwh/quiz/components/dashboard.php", true);
 }
 
-
 if ($_SERVER['REQUEST_METHOD'] == "POST") {
     $question = isset($_POST["question"]) ? $_POST["question"] : null;
     $opt1 = isset($_POST["opt1"]) ? $_POST["opt1"] : null;
@@ -189,9 +188,9 @@ if ($_SERVER['REQUEST_METHOD'] == "POST") {
 
     <div class="container my-3 ">
         <h2 class="text-center">Question Dashboard</h2>
-        <table class="table table-hover table-bordered ">
-            <thead class="">
-                <tr>
+        <table class="table table-light  table-hover table-bordered " id="myTable">
+            <thead class="border border-1 ">
+                <tr class="border border-1 ">
                     <th>Sr.no</th>
                     <th>Question</th>
                     <th>Option-1</th>
@@ -202,13 +201,14 @@ if ($_SERVER['REQUEST_METHOD'] == "POST") {
                 </tr>
             </thead>
             <tbody>
+
                 <?php
                 $sql = "SELECT * FROM `quizques`";
                 $result = mysqli_query($conn, $sql);
                 if ($result) {
                     $srno = 1;
                     while ($row = mysqli_fetch_assoc($result)) {
-                        echo "<tr>
+                        echo "<tr scope='row'>
                         <th scope='row'>" . $srno . "</th>
                         <td>" . $row['question'] . "</td>
                         ";
@@ -241,8 +241,18 @@ if ($_SERVER['REQUEST_METHOD'] == "POST") {
                 ?>
             </tbody>
         </table>
-    </div>
 
+        <pre>
+
+
+
+
+
+        </pre>
+    </div>
+    <script>
+        let table = new DataTable('#myTable');
+    </script>
     <script>
 
         const answers = document.getElementsByClassName('ansFlag');

@@ -21,6 +21,7 @@ class Question
 
     public function insertQuestion($conn)
     {
+        $this->question = str_replace("'", "\'", $this->question);
         $sql = "INSERT INTO `quizques` (`sno`, `question`, `opt1`, `opt2`, `opt3`, `answer`, `opt4`) VALUES (NULL, '$this->question', '$this->opt1', '$this->opt2', '$this->opt3', '$this->ans', '$this->opt4')";
 
         if ($conn->query($sql) == true) {
