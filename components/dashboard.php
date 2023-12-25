@@ -6,12 +6,14 @@ if ($_SESSION['role'] != 'admin') {
 
 include("../classes/Database.php");
 include("../classes/Questions.php");
+include("../classes/ajax.php");
 include("./alert.php");
 
 // object initializations 
 $connectDb = new DatabaseConnection('localhost', 'root', '', 'quiz');
+// $conn = $connectDb->connect();
 $questionObj = new Question();
-$conn = $connectDb->connect();
+$ajaxObj = new Ajax();
 
 $quesAlert = false;
 $updateAlert = false;
@@ -20,79 +22,40 @@ $updateMessage = "";
 if (isset($_GET["deleteOpt"])) {
     $optionIndex = $_GET["deleteOpt"];
     $id = $_GET["id"];
-    $updateAlert = $questionObj->deleteOption($conn, $optionIndex, $id);
+    $updateAlert = $questionObj->deleteOption($optionIndex, $id);
     // header('Location: /cwh/quiz/components/dashboard.php', true);
     unset($_SESSION["deleteOpt"]);
 }
 if (isset($_GET["ansOpt"])) {
     $id = $_GET["id"];
     $optionIndex = $_GET["opt"];
-    $updateAlert = $questionObj->markAns($conn, $optionIndex, $id);
+    $updateAlert = $questionObj->markAns($optionIndex, $id);
     // header("Location: /cwh/quiz/components/dashboard.php", true);
 }
 
-if ($_SERVER['REQUEST_METHOD'] == "POST") {
-    $question = isset($_POST["question"]) ? $_POST["question"] : null;
-    $opt1 = isset($_POST["opt1"]) ? $_POST["opt1"] : null;
-    $opt2 = isset($_POST["opt2"]) ? $_POST["opt2"] : null;
-    $opt3 = isset($_POST["opt3"]) ? $_POST["opt3"] : null;
-    $opt4 = isset($_POST["opt4"]) ? $_POST["opt4"] : null;
-    $ans = isset($_POST["ansFlag"]) ? $_POST["ansFlag"] : null;
+// if (isset($_POST['updateOpt'])) {
+//     $opt1 = isset($_POST["opt1"]) ? $_POST["opt1"] : null;
+//     $opt2 = isset($_POST["opt2"]) ? $_POST["opt2"] : null;
+//     $opt3 = isset($_POST["opt3"]) ? $_POST["opt3"] : null;
+//     $opt4 = isset($_POST["opt4"]) ? $_POST["opt4"] : null;
+//     $ans = isset($_POST["ansFlag"]) ? $_POST["ansFlag"] : null;
+//     $id = $_POST["updateOpt"];
 
-    if (isset($_POST['updateOpt'])) {
-        $id = $_POST["updateOpt"];
-        if ($opt3) {
-            if (isset($_POST["ansFlag"])) {
-                $updateAlert = $questionObj->addOption($conn, "opt3", $opt3, $id, true, $ans);
-            } else {
-                $updateAlert = $questionObj->addOption($conn, "opt3", $opt3, $id);
-            }
-        } else if ($opt4) {
-            if (isset($_POST["ansFlag"])) {
-                $updateAlert = $questionObj->addOption($conn, "opt4", $opt4, $id, true, $ans);
-            } else {
-                $updateAlert = $questionObj->addOption($conn, "opt4", $opt4, $id);
-            }
-        } else if ($opt1) {
-            if (isset($_POST["ansFlag"])) {
-                $updateAlert = $questionObj->addOption($conn, "opt1", $opt1, $id, true, $ans);
-            } else {
-                $updateAlert = $questionObj->addOption($conn, "opt1", $opt1, $id);
-            }
-        } else if ($opt2) {
-            if (isset($_POST["ansFlag"])) {
-                $updateAlert = $questionObj->addOption($conn, "opt2", $opt2, $id, true, $ans);
-            } else {
-                $updateAlert = $questionObj->addOption($conn, "opt2", $opt2, $id);
-            }
-        }
-    } else {
-        $questionObj = new Question($question, $opt1, $opt2, $opt3, $opt4, $ans);
-        $questionObj->insertQuestion($conn);
-        if ($questionObj) {
-            $quesAlert = true;
-        }
-    }
-    // // if ($row["opt1"] == null) {
-    // //     echo "<form action='/cwh/quiz/components/dashboard.php' method='post' >
-    // //         <input type='hidden' name='updateOpt' id='updateOpt' value=" . $row['sno'] . ">
-    // //         <div class='form-group my-2 d-flex align-items-center justify-content-center'>
-    // //         <input type='radio' name='ansFlag' class='ansFlag'>
-    // //         <input type='text' name='opt1' id='opt1' placeholder='Enter Option 1' class='form-control form-control-sm w-50 mx-2 h-75 optionInput'>
-    // //         <input type='submit' value='submit' class='btn btn-outline-secondary btn-sm my-2'>
-    // //         </div>
-    // //         </div>
-    // //         </form>";
-    // // } else {
-    // //     echo $row['opt1'];
-    // //     echo "<button class='removeBtn deleteOpt float-end ' id='opt1' value=" . $row['sno'] . " > remove </button>";
-    // // }
+//     $optionArray = [$opt1, $opt2, $opt3, $opt4];
 
-    // function displayOptions($option , $srno , ){
-    //     return ""
-    // }
-}
+//     for ($i = 0; $i <= 3; $i++) {
+//         if ($optionArray[$i]) {
+//             if (isset($_POST["ansFlag"])) {
+//                 $updateAlert = $questionObj->addOption("opt" . $i + 1, $optionArray[$i], $id, true, $ans);
+//             } else {
+//                 $updateAlert = $questionObj->addOption("opt" . $i + 1, $optionArray[$i], $id);
+//             }
+//         }
+//     }
+// }
 
+
+$result = $questionObj->getAll();
 ?>
 
 <!DOCTYPE html>
@@ -109,8 +72,6 @@ if ($_SERVER['REQUEST_METHOD'] == "POST") {
         integrity="sha384-w76AqPfDkMBDXo30jS1Sgez6pr3x5MlQ1ZAGC+nuZB+EYdgRZgiwxhTBTkF7CXvN"
         crossorigin="anonymous"></script>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
-    <link rel="stylesheet" href="//cdn.datatables.net/1.13.7/css/jquery.dataTables.min.css">
-    <script src="//cdn.datatables.net/1.13.7/js/jquery.dataTables.min.js"></script>
     <style>
         .submitBtn {
             width: 150px;
@@ -159,8 +120,6 @@ if ($_SERVER['REQUEST_METHOD'] == "POST") {
     }
 
     ?>
-
-
     <div class="container col-md-6 mt-3  border border-1 " style="box-shadow: rgba(0, 0, 0, 0.24) 0px 3px 8px;">
         <h1 class="text-center">Add Question</h1>
         <form class="" action="/cwh/quiz/components/dashboard.php" method="POST" id="myform">
@@ -182,7 +141,7 @@ if ($_SERVER['REQUEST_METHOD'] == "POST") {
                 <input type="text" name="opt2" id="opt2" placeholder="Enter Option 2"
                     class="form-control form-control-sm w-50 mx-2 ">
             </div>
-            <input type="submit" value="submit" class="submitBtn my-2">
+            <input type="submit" id="submitQue" value="submit" class="submitBtn my-2">
         </form>
     </div>
 
@@ -201,44 +160,55 @@ if ($_SERVER['REQUEST_METHOD'] == "POST") {
                 </tr>
             </thead>
             <tbody>
+                <?php if ($result):
+                    $srno = 1; ?>
+                    <?php while ($row = mysqli_fetch_assoc($result)): ?>
+                        <tr scope='row'>
+                            <th scope='row'>
+                                <?php echo $srno ?>
+                            </th>
+                            <td>
+                                <?php echo $row['question'] ?>
+                            </td>
+                            <?php $options = array($row['opt1'], $row['opt2'], $row['opt3'], $row['opt4']); ?>
 
-                <?php
-                $sql = "SELECT * FROM `quizques`";
-                $result = mysqli_query($conn, $sql);
-                if ($result) {
-                    $srno = 1;
-                    while ($row = mysqli_fetch_assoc($result)) {
-                        echo "<tr scope='row'>
-                        <th scope='row'>" . $srno . "</th>
-                        <td>" . $row['question'] . "</td>
-                        ";
-                        $options = array($row['opt1'], $row['opt2'], $row['opt3'], $row['opt4']);
-
-                        for ($i = 0; $i <= 3; $i++) {
-                            echo "<td>";
-                            if ($options[$i] == null) {
-                                echo "<form action='/cwh/quiz/components/dashboard.php' method='post' >
-                                <input type='hidden' name='updateOpt' id='updateOpt' value=" . $row['sno'] . ">
-                                <div class='form-group my-2 d-flex align-items-center justify-content-center'>
-                                <input type='radio' name='ansFlag' class='ansFlag'>
-                                <input type='text' name='opt" . $i + 1 . "' id='opt" . $i + 1 . "' placeholder='Enter Option " . $i + 1 . "' class='form-control form-control-sm w-50 mx-2 h-75 optionInput'>
-                                <input type='submit' value='submit' class='btn btn-outline-secondary btn-sm my-2'>
-                                </div>
-                                </div>
-                                </form></td>";
-                            } else {
-                                $option = "opt" . $i + 1;
-                                echo "<div class='d-flex justify-content-start flex-column gap-1 '> <div>" . $options[$i] . "</div>";
-                                echo "<div class='d-flex justify-content-start flex-row gap-1 align-items-start   '><button class='removeBtn deleteOpt ' id='opt" . $i + 1 . "' value=" . $row['sno'] . " > remove </button>";
-                                echo " <button class='ansFlagBtn ansOpt  mx-2' id=" . $row['sno'] . "  value='$option'> answer </button></div></div>";
-                            }
-                            echo "</td>";
-                        }
-                        echo "</td><td>" . $row['answer'] . "</td></tr>";
-                        $srno++;
-                    }
-                }
-                ?>
+                            <?php for ($i = 0; $i <= 3; $i++): ?>
+                                <?php if ($options[$i] == null): ?>
+                                    <td>
+                                        <form action='/cwh/quiz/components/dashboard.php' method='post'>
+                                            <?php echo "<input type='hidden' name='updateOpt' id='updateOpt' value=" . $row['sno'] . ">"; ?>
+                                            <div class='form-group my-2 d-flex align-items-center justify-content-center'>
+                                                <input type='radio' name='ansFlag' class='ansFlag'>
+                                                <?php echo "<input type='text' name='opt" . $i + 1 . "' id='opt" . $i + 1 . "' placeholder='Enter Option " . $i + 1 . "' class='form-control form-control-sm w-50 mx-2 h-75 optionInput'>"; ?>
+                                                <input type='submit' value='submit' id="updateOpt"
+                                                    class='btn btn-outline-secondary btn-sm my-2'>
+                                            </div>
+                                        </form>
+                                    </td>
+                                <?php else: ?>
+                                    <td>
+                                        <?php $option = "opt" . $i + 1; ?>
+                                        <div class='d-flex justify-content-start flex-column gap-1 '>
+                                            <div>
+                                                <?php echo $options[$i] ?>
+                                            </div>
+                                            <div class='d-flex justify-content-start flex-row gap-1 align-items-start   '>
+                                                <?php echo "<button class='removeBtn deleteOpt ' id='opt" . $i + 1 . "' value=" . $row['sno'] . " > remove </button>"; ?>
+                                                <?php echo " <button class='ansFlagBtn ansOpt  mx-2' id=" . $row['sno'] . "  value='$option'> answer </button>"; ?>
+                                            </div>
+                                        </div>
+                                    </td>
+                                <?php endif ?>
+                            <?php endfor ?>
+                            </td>
+                            <td>
+                                <?php echo $row['answer'] ?>
+                            </td>
+                        </tr>
+                        <?php $srno++; ?>
+                    <?php endwhile ?>
+                <?php endif ?>
+                </tr>
             </tbody>
         </table>
 
@@ -250,9 +220,6 @@ if ($_SERVER['REQUEST_METHOD'] == "POST") {
 
         </pre>
     </div>
-    <script>
-        let table = new DataTable('#myTable');
-    </script>
     <script>
 
         const answers = document.getElementsByClassName('ansFlag');
@@ -303,6 +270,24 @@ if ($_SERVER['REQUEST_METHOD'] == "POST") {
                     console.log('no');
                 }
             })
+        })
+
+        $(document).ready(function () {
+            $('#submitQue').click(function () {
+                console.log('hello');
+                $.ajax({
+                    type: 'POST',
+                    url: '/cwh/quiz/CRUD/addQuestion.php',
+                    success: function (response) {
+                        console.log('successfully inseted')
+                    },
+                    error: function (xhr, status, error) {
+                        console.error(error);
+                    }
+                });
+            })
+
+
         })
     </script>
 </body>

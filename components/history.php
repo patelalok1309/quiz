@@ -7,7 +7,6 @@ include("../classes/Database.php");
 $db = new DatabaseConnection('localhost', 'root', "", 'quiz');
 $conn = $db->connect();
 
-
 if ($_SERVER['REQUEST_METHOD'] == "POST") {
     $dataArr = json_decode($_POST["data"], true);
     $username = $dataArr['username'];

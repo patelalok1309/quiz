@@ -1,6 +1,5 @@
 <?php
-
-class Question
+class Question extends DatabaseConnection
 {
     public $question;
     public $opt1;
@@ -11,6 +10,7 @@ class Question
 
     public function __construct($question = null, $opt1 = null, $opt2 = null, $opt3 = null, $opt4 = null, $ans = null)
     {
+        parent::__construct('localhost', 'root', '', 'quiz');
         $this->question = $question;
         $this->opt1 = $opt1;
         $this->opt2 = $opt2;
@@ -19,108 +19,90 @@ class Question
         $this->ans = $ans;
     }
 
-    public function insertQuestion($conn)
-    {
-        $this->question = str_replace("'", "\'", $this->question);
-        $sql = "INSERT INTO `quizques` (`sno`, `question`, `opt1`, `opt2`, `opt3`, `answer`, `opt4`) VALUES (NULL, '$this->question', '$this->opt1', '$this->opt2', '$this->opt3', '$this->ans', '$this->opt4')";
 
-        if ($conn->query($sql) == true) {
-            return true;
-        } else {
-            echo "Sorry try harder";
-        }
+    public function insertQuestion()
+    {
+        $data = array("question" => $this->question, "answer" => $this->ans, "opt1" => $this->opt1, "opt2" => $this->opt2, "opt3" => $this->opt3, "opt4" => $this->opt4);
+
+        return $this->insert("quizques", $data);
     }
 
-    public function addOption($conn, $opt, $optval, $id, $setAns = false, $ans = null)
-    {
-        $sql = "UPDATE `quizques` SET `$opt` = '$optval', `answer`='$ans' WHERE `quizques`.`sno` = '$id'";
 
+    public function addOption($opt, $optval, $id, $setAns = false, $ans = null)
+    {
         if ($setAns) {
-            $sql = "UPDATE `quizques` SET `$opt` = '$optval', `answer`='$ans' WHERE `quizques`.`sno` = '$id'";
+            $data = "`$opt` = '$optval' , `answer`= '$ans' ";
         } else {
-            $sql = "UPDATE `quizques` SET `$opt` = '$optval' WHERE `quizques`.`sno` = '$id'";
+            $data = "`$opt` = '$optval'";
         }
-        if ($conn->query($sql) == true) {
-            return true;
-        } else {
-            echo "failed to Add new Option";
-        }
+        $condition = "`quizques`.`sno` = $id";
+        return $this->update("quizques", $data, $condition);
     }
 
-    public function checkIfAnsSame($conn, $option, $sno)
+    public function checkIfAnsSame($option, $sno): bool
     {
-        $sql = "SELECT * FROM quizques WHERE $option=answer AND sno='$sno'";
-        $result = $conn->query($sql);
+
+        $condition = "sno='$sno'";
+        $result = $this->select('quizques', '*', $condition);
         $totalOptions = 0;
-        while ($row = $result->fetch_assoc()) {
-            for ($i = 1; $i <= 4; $i++) {
-                if ($row["opt" . "$i"] !== null) {
-                    $totalOptions++;
+
+        if ($result) {
+
+            while ($row = $result->fetch_assoc()) {
+
+                for ($i = 1; $i <= 4; $i++) {
+                    if ($row["opt" . "$i"] != null) {
+                        $totalOptions++;
+                    }
                 }
             }
-        }
 
-        if ($totalOptions > 2) {
-            $sql = "SELECT * FROM quizques WHERE $option=answer AND sno='$sno'";
-            $isSame = $conn->query($sql);
-            if (mysqli_num_rows($isSame) == 0) {
-                return false;
-            } else {
+            if ($totalOptions > 2) {
+                $condition = "$option=answer AND sno='$sno'";
+                $result = $this->select("quizques", "*", $condition);
                 return true;
+
+            } else {
+                return false;
             }
         } else {
             return false;
         }
     }
 
-    public function deleteOption($conn, $opt, $sno)
+    public function deleteOption($opt, $sno)
     {
-        if ($this->checkIfAnsSame($conn, "$opt", $sno)) {
+        if (!$this->checkIfAnsSame("$opt", $sno)) {
             return false;
         } else {
             $optionIndex = substr($opt, -1);
             $nextOption = "opt" . $optionIndex + 1;
 
             if ($optionIndex != 4) {
-                $sql = "UPDATE `quizques` SET  `$opt`=`$nextOption`, `$nextOption` = null  WHERE quizques.sno = '$sno' ";
-                if ($conn->query($sql) == true) {
-                    return true;
-                } else {
-                    echo "Sorry try harder";
-                }
+                $data = "`$opt`=`$nextOption`, `$nextOption` = null";
+                $condition = "quizques.sno = '$sno'";
+                return $this->update("quizques", $data, $condition);
             } else {
-                $sql = "UPDATE `quizques` SET  `$opt` = null  WHERE `quizques`.`sno` = '$sno' ";
-                if ($conn->query($sql) == true) {
-                    return true;
-                } else {
-                    echo "Sorry try harder";
-                }
+                $data = "`$opt`= null";
+                $condition = "quizques.sno = '$sno'";
+                return $this->update("quizques", $data, $condition);
             }
         }
     }
 
-    public function markAns($conn, $opt, $sno)
+    public function markAns($opt, $sno)
     {
-        $sql = "UPDATE `quizques` SET `answer` = `$opt` WHERE `quizques`.`sno` = '$sno'";
-        if ($conn->query($sql) == true) {
-            return true;
-        } else {
-            echo "failed to update the answer";
-        }
+        $data = "`answer`=`$opt`";
+        $condition = "quizques.sno = '$sno'";
+        return $this->update("quizques", $data, $condition);
     }
 
-    public function getAll($conn)
+    public function getAll()
     {
-        $sql = "SELECT * FROM `quizques`";
-        $result = $conn->query($sql);
-        echo mysqli_num_rows($result);
-        $data = array();
-        do {
-            array_push($data, $result->fetch_assoc());
-        } while ($result->fetch_assoc());
-
-        return json_encode($data);
+        $result = $this->select("quizques");
+        return $result;
     }
+
 }
 
 

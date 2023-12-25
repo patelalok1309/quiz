@@ -1,6 +1,3 @@
-<?php
-include("./classes/Quiz.php");
-?>
 <!DOCTYPE html>
 <html lang="en">
 
