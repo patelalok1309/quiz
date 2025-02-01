@@ -4,7 +4,7 @@ include("./components/alert.php");
 if (!isset($_SESSION["username"])) {
 
     alert("danger", "Please Login to Start Quiz");
-    header("Location: /cwh/quiz/components/login.php", true);
+    header("Location: /quiz/components/login.php", true);
 }
 ?>
 

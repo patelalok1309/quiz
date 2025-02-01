@@ -21,7 +21,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         $_SESSION['sno'] = $row['sno'];
         $_SESSION['role'] = $row['role'];
         $_SESSION['email'] = $row['email'];
-        header("Location: /cwh/quiz/index.php", true);
+        header("Location:/quiz/index.php", true);
     } else {
         $loginerror = true;
     }
@@ -54,7 +54,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     }
     ?>
     <div class="container d-flex justify-content-center align-items-center ">
-        <form action="/cwh/quiz/components/login.php" method="post" class="col-md-6">
+        <form action="/quiz/components/login.php" method="post" class="col-md-6">
             <fieldset>
                 <legend>
                     <h1 class="text-center">Login</h1>

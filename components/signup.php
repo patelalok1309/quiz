@@ -60,7 +60,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     }
     ?>
     <div class="container d-flex justify-content-center align-items-center ">
-        <form action="/cwh/quiz/components/signup.php" method="post" class="col-md-6">
+        <form action="/quiz/components/signup.php" method="post" class="col-md-6">
             <fieldset>
                 <legend>
                     <h1 class="text-center">Signup</h1>

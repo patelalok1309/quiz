@@ -1,7 +1,7 @@
 <?php
 session_start();
 if ($_SESSION['role'] != 'admin') {
-    header("Location: /cwh/quiz/index.php", true);
+    header("Location: /quiz/index.php", true);
 }
 
 include("../classes/Database.php");
@@ -23,14 +23,14 @@ if (isset($_GET["deleteOpt"])) {
     $optionIndex = $_GET["deleteOpt"];
     $id = $_GET["id"];
     $updateAlert = $questionObj->deleteOption($optionIndex, $id);
-    // header('Location: /cwh/quiz/components/dashboard.php', true);
+    // header('Location: /quiz/components/dashboard.php', true);
     unset($_SESSION["deleteOpt"]);
 }
 if (isset($_GET["ansOpt"])) {
     $id = $_GET["id"];
     $optionIndex = $_GET["opt"];
     $updateAlert = $questionObj->markAns($optionIndex, $id);
-    // header("Location: /cwh/quiz/components/dashboard.php", true);
+    // header("Location: /quiz/components/dashboard.php", true);
 }
 
 // if (isset($_POST['updateOpt'])) {
@@ -122,7 +122,7 @@ $result = $questionObj->getAll();
     ?>
     <div class="container col-md-6 mt-3  border border-1 " style="box-shadow: rgba(0, 0, 0, 0.24) 0px 3px 8px;">
         <h1 class="text-center">Add Question</h1>
-        <form class="" action="/cwh/quiz/components/dashboard.php" method="POST" id="myform">
+        <form class="" action="/quiz/components/dashboard.php" method="POST" id="myform">
             <div class="form-group my-4 ">
                 <label class="form-label col-sm-2" for="question">Question:</label>
                 <div class="col-sm-10">
@@ -175,7 +175,7 @@ $result = $questionObj->getAll();
                             <?php for ($i = 0; $i <= 3; $i++): ?>
                                 <?php if ($options[$i] == null): ?>
                                     <td>
-                                        <form action='/cwh/quiz/components/dashboard.php' method='post'>
+                                        <form action='/quiz/components/dashboard.php' method='post'>
                                             <?php echo "<input type='hidden' name='updateOpt' id='updateOpt' value=" . $row['sno'] . ">"; ?>
                                             <div class='form-group my-2 d-flex align-items-center justify-content-center'>
                                                 <input type='radio' name='ansFlag' class='ansFlag'>
@@ -251,7 +251,7 @@ $result = $questionObj->getAll();
                 optionIndex = e.target.id;
                 if (confirm("Are you sure You really wan't to delete note!")) {
                     console.log('yes');
-                    window.location = `/cwh/quiz/components/dashboard.php?deleteOpt=${optionIndex}&id=${sno}`;
+                    window.location = `/quiz/components/dashboard.php?deleteOpt=${optionIndex}&id=${sno}`;
                 } else {
                     console.log('no');
                 }
@@ -265,7 +265,7 @@ $result = $questionObj->getAll();
                 console.log(sno, option, e.target);
                 if (confirm("Are you sure You really wan't to Mark as answer!")) {
                     console.log('yes');
-                    window.location = `/cwh/quiz/components/dashboard.php?id=${sno}&opt=${option}&ansOpt=true`;
+                    window.location = `/quiz/components/dashboard.php?id=${sno}&opt=${option}&ansOpt=true`;
                 } else {
                     console.log('no');
                 }
@@ -277,7 +277,7 @@ $result = $questionObj->getAll();
                 console.log('hello');
                 $.ajax({
                     type: 'POST',
-                    url: '/cwh/quiz/CRUD/addQuestion.php',
+                    url: '/quiz/CRUD/addQuestion.php',
                     success: function (response) {
                         console.log('successfully inseted')
                     },

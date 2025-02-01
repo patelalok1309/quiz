@@ -116,8 +116,8 @@
                 await $.ajax({
                     type: 'get',
                     dataType: "json",
-                    url: "/cwh/quiz/components/getQuestions.php",
-                    success: function (response) {
+                    url: "/quiz/components/getQuestions.php",
+                    success: function (response) {  
                         getResponse(response);
                     }
                 })
@@ -195,7 +195,7 @@
                     recordAns = JSON.stringify(recordAns);
                     $.ajax({
                         type: 'POST',
-                        url: '/cwh/quiz/components/result.php',
+                        url: '/quiz/components/result.php',
                         data: { data: recordAns },
                         success: function (response) {
                             response = JSON.parse(response);
@@ -219,7 +219,7 @@
             ans = JSON.stringify(arr);
             $.ajax({
                 type: 'POST',
-                url: '/cwh/quiz/components/history.php',
+                url: '/quiz/components/history.php',
                 data: { data: ans },
                 success: function (response) {
                     console.log('added')

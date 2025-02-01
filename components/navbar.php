@@ -1,7 +1,7 @@
 <?php
 ?>
 <nav class="navbar navbar-expand-sm navbar-dark bg-dark px-5 ">
-    <a class="navbar-brand" href="/cwh/quiz/index.php">Quiz</a>
+    <a class="navbar-brand" href="/quiz/index.php">Quiz</a>
     <button class="navbar-toggler d-lg-none" type="button" data-bs-toggle="collapse" data-bs-target="#collapsibleNavId"
         aria-controls="collapsibleNavId" aria-expanded="false" aria-label="Toggle navigation"></button>
     <div class="collapse navbar-collapse" id="collapsibleNavId">
@@ -9,28 +9,28 @@
             <li class="nav-item">
                 <?php
                 if (isset($_SESSION['username'])) {
-                    echo "<a class='nav-link' href='/cwh/quiz/components/logout.php'>logout</a>";
+                    echo "<a class='nav-link' href='/quiz/components/logout.php'>logout</a>";
                 } else {
-                    echo "<a class='nav-link' href='/cwh/quiz/components/login.php'>login</a>";
+                    echo "<a class='nav-link' href='/quiz/components/login.php'>login</a>";
                 }
                 ?>
             </li>
             <li class="nav-item">
                 <?php
                 if (!isset($_SESSION['username'])) {
-                    echo "<a class='nav-link' href='/cwh/quiz/components/signup.php'>Sign Up</a>";
+                    echo "<a class='nav-link' href='/quiz/components/signup.php'>Sign Up</a>";
                 }
                 ?>
             </li>
             <li class="nav-item text-white ">
                 <?php
                 if (isset($_SESSION['username'])) {
-                    echo "<a class='nav-link' href='/cwh/quiz/components/history.php'>History</a>";
+                    echo "<a class='nav-link' href='/quiz/components/history.php'>History</a>";
                 }
                 ?>
             </li>
             <li class="nav-item">
-                <a class="nav-link" href="/cwh/quiz/components/dashboard.php">
+                <a class="nav-link" href="/quiz/components/dashboard.php">
                     <?php
                     if (isset($_SESSION['role'])) {
                         if ($_SESSION['role'] == 'admin') {
